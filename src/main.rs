@@ -12,7 +12,7 @@ fn main() {
         process::exit(1);
     }
 
-    let mut regexes: Vec<&Regex> = Vec::new();
+    let mut regexes: Vec<Regex> = Vec::new(); // 支持多参数
 
     for arg in &args {
     let pattern = arg;
@@ -23,10 +23,10 @@ fn main() {
             process::exit(1);
         }
     };
-    regexes.push(&regex);
+    regexes.push(regex);
     }
 
-    match find(&args[1], regexes) {
+    match find(&args[1], &regexes) {
         Ok(matches) => {
             if matches.is_empty() {
                 println!("未找到匹配项。");
@@ -44,7 +44,7 @@ fn main() {
     }
 }
 
-fn find<P: AsRef<Path>>(root: P, regex: Vec<&Regex>) -> Result<Vec<String>, Box<dyn std::error::Error>> {
+fn find<P: AsRef<Path>>(root: P, regex: &Vec<Regex>) -> Result<Vec<String>, Box<dyn std::error::Error>> {
     let mut matches = Vec::new();
     walk_tree(root.as_ref(), regex, &mut matches)?;
     Ok(matches)
@@ -52,7 +52,7 @@ fn find<P: AsRef<Path>>(root: P, regex: Vec<&Regex>) -> Result<Vec<String>, Box<
 
 fn walk_tree(
     dir: &Path,
-    regex: Vec<&Regex>,
+    regex: &Vec<Regex>,
     matches: &mut Vec<String>,
 ) -> Result<(), Box<dyn std::error::Error>> {
     if dir.is_dir() {
